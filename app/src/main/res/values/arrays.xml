@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="languages">
+        <item>全    部</item>
+        <item>休息视频</item>
+        <item>拓展资源</item>
+        <item>福    利</item>
+        <item>瞎  推荐</item>
+        <item>前    端</item>
+        <item> Android</item>
+        <item>   iOS  </item>
+        <item>   APP  </item>
+    </string-array>
+</resources>

@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Gank</string>
+    <string name="app_home">福利</string>
+    <string name="app_search">输入搜索内容</string>
+    <string name="action_search">action_search</string>
+    <string name="action_settings">action_settings</string>
+    <string name="action_login">未登录，点击登录</string>
+    <string name="action_home">首页</string>
+    <string name="action_classify">分类浏览</string>
+    <string name="action_collect">我的收藏</string>
+    <string name="action_notes">我的笔记</string>
+    <string name="action_wifi">仅WIFI加载图片</string>
+    <string name="action_theme">夜间模式</string>
+    <string name="action_version">当前版本</string>
+    <string name="action_grammar">参考语法</string>
+    <string name="action_share">分享</string>
+    <string name="action_about">关于</string>
+    <string name="action_feedback">反馈</string>
+    <string name="action_quit">退出登录</string>
+</resources>
