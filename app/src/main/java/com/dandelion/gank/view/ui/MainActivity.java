@@ -91,21 +91,21 @@ public class MainActivity extends ToolBarActivity{
         hideFragments(transaction);
         switch (index) {
             case 1:
-                setActionBarTitle("妹纸");
-                if (homeFragment == null) {
-                    homeFragment = new HomeFragment();
-                    transaction.add(R.id.content, homeFragment);
-                } else {
-                    transaction.show(homeFragment);
-                }
-                break;
-            case 2:
-                setActionBarTitle("分类浏览");
+                setActionBarTitle("首页");
                 if (tabFragment == null) {
                     tabFragment = new TabFragment();
                     transaction.add(R.id.content, tabFragment);
                 } else {
                     transaction.show(tabFragment);
+                }
+                break;
+            case 2:
+                setActionBarTitle("闲读");
+                if (homeFragment == null) {
+                    homeFragment = new HomeFragment();
+                    transaction.add(R.id.content, homeFragment);
+                } else {
+                    transaction.show(homeFragment);
                 }
                 break;
             case 3:
@@ -163,7 +163,7 @@ public class MainActivity extends ToolBarActivity{
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
                         if (profile instanceof IDrawerItem && profile.getIdentifier() == 100) {
-                            startActivity(new Intent(context, TestActivity.class));
+                            startActivity(new Intent(context, LoginActivity.class));
 
                         }
 
@@ -179,7 +179,7 @@ public class MainActivity extends ToolBarActivity{
                 .withAccountHeader(header)
                 .addDrawerItems(
                         new PrimaryDrawerItem().withName(R.string.action_home).withIcon(R.mipmap.account_circle).withIdentifier(1).withSelectable(true),
-                        new PrimaryDrawerItem().withName(R.string.action_classify).withIcon(R.mipmap.account_circle).withIdentifier(2).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.action_read).withIcon(R.mipmap.account_circle).withIdentifier(2).withSelectable(true),
                         new PrimaryDrawerItem().withName(R.string.action_collect).withIcon(R.mipmap.account_circle).withIdentifier(3).withSelectable(true),
                         new PrimaryDrawerItem().withName(R.string.action_notes).withIcon(R.mipmap.account_circle).withIdentifier(4).withSelectable(true),
                         new DividerDrawerItem(),

@@ -8,7 +8,6 @@ import java.util.List;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
 import retrofit2.http.Path;
 import retrofit2.http.Streaming;
 import rx.Observable;
@@ -22,7 +21,7 @@ public interface GankApi {
     @GET("16891/EF12067216FBAF87928628A120425014.apk")
     Call<ResponseBody> downloadUpdate();
 
-    @POST("data/福利/{pageSize}/{page}")
+    @GET("data/福利/{pageSize}/{page}")
     Observable<GankRoot<List<GankResult>>> getHomeData(@Path("pageSize") int pageSzie, @Path("page") int page);
 
     @GET("data/all/{pageSize}/{page}")

@@ -9,7 +9,7 @@
         <item
             android:id="@+id/menu_classify"
             android:icon="@mipmap/classify"
-            android:title="@string/action_classify" />
+            android:title="@string/action_read" />
         <item
             android:id="@+id/menu_collect"
             android:icon="@mipmap/classify"
