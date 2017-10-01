@@ -3,6 +3,7 @@ package com.dandelion.gank.view.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -15,14 +16,13 @@ import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import com.dandelion.gank.R;
-import com.dandelion.gank.utils.AppUpdateHelp;
-import com.dandelion.gank.utils.PreferencesLoader;
+import com.dandelion.gank.utils.SPUtils;
 import com.dandelion.gank.utils.SharesUtils;
-import com.dandelion.gank.view.adapter.MainAdapter;
 import com.dandelion.gank.view.fragment.CollectFragment;
-import com.dandelion.gank.view.fragment.HomeFragment;
+import com.dandelion.gank.view.fragment.MeizhiFragment;
 import com.dandelion.gank.view.fragment.NotesFragment;
 import com.dandelion.gank.view.fragment.TabFragment;
+import com.dandelion.gank.view.fragment.TabReadFragment;
 import com.mikepenz.itemanimators.AlphaCrossFadeAnimator;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
@@ -32,37 +32,42 @@ import com.mikepenz.materialdrawer.interfaces.OnCheckedChangeListener;
 import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.mikepenz.materialdrawer.model.SwitchDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.mikepenz.materialdrawer.model.interfaces.Nameable;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-import butterknife.Bind;
+import butterknife.BindView;
+import butterknife.OnClick;
 
 public class MainActivity extends ToolBarActivity{
 
 
-    @Bind(R.id.drawer)
+    @BindView(R.id.drawer)
     DrawerLayout drawer;
+    @BindView(R.id.fab)
+    FloatingActionButton mFab;
 
     Toolbar toolBar;
 
-    private List<String> recyclerData = new ArrayList<>();
-    private MainAdapter mAdapter;
 
     private AccountHeader header = null;
     private Drawer result = null;
 
-    private HomeFragment homeFragment;
+    private MeizhiFragment mMZFragment;
     private TabFragment tabFragment;
     private CollectFragment collectFragment;
     private NotesFragment notesFragment;
+    private TabReadFragment mTabReadFragment;
 
     private FragmentManager fm;
     private FragmentTransaction transaction;
+//    private IProfile profile;
+    private boolean isLogin;
+    private String withEmail;
 
     @Override
     public int getLayoutId() {
@@ -71,7 +76,8 @@ public class MainActivity extends ToolBarActivity{
 
     @Override
     public void onCreateAfter(Bundle savedInstanceState) {
-        AppUpdateHelp.startUpdate(activity, false);
+//        AppUpdateHelp.startUpdate(activity, false);
+        EventBus.getDefault().register(this);
         fm = getSupportFragmentManager();
         toolBar = getToolbar();
         setMaterialDrawer();
@@ -100,12 +106,12 @@ public class MainActivity extends ToolBarActivity{
                 }
                 break;
             case 2:
-                setActionBarTitle("闲读");
-                if (homeFragment == null) {
-                    homeFragment = new HomeFragment();
-                    transaction.add(R.id.content, homeFragment);
+                setActionBarTitle("妹纸");
+                if (mMZFragment == null) {
+                    mMZFragment = new MeizhiFragment();
+                    transaction.add(R.id.content, mMZFragment);
                 } else {
-                    transaction.show(homeFragment);
+                    transaction.show(mMZFragment);
                 }
                 break;
             case 3:
@@ -126,6 +132,15 @@ public class MainActivity extends ToolBarActivity{
                     transaction.show(notesFragment);
                 }
                 break;
+            case 0:
+                setActionBarTitle("闲读");
+                if (mTabReadFragment == null) {
+                    mTabReadFragment = new TabReadFragment();
+                    transaction.add(R.id.content, mTabReadFragment);
+                } else {
+                    transaction.show(mTabReadFragment);
+                }
+                break;
         }
         transaction.commit();
 
@@ -133,8 +148,8 @@ public class MainActivity extends ToolBarActivity{
     }
 
     private void hideFragments(FragmentTransaction transaction) {
-        if (homeFragment != null) {
-            transaction.hide(homeFragment);
+        if (mMZFragment != null) {
+            transaction.hide(mMZFragment);
         }
         if (tabFragment != null) {
             transaction.hide(tabFragment);
@@ -145,10 +160,19 @@ public class MainActivity extends ToolBarActivity{
         if (notesFragment != null) {
             transaction.hide(notesFragment);
         }
+        if (mTabReadFragment != null) {
+            transaction.hide(mTabReadFragment);
+        }
     }
 
     private void setMaterialDrawer() {
-        IProfile profile = new ProfileDrawerItem().withEmail("未登录，点击登录").withIcon(R.mipmap.profile3).withIdentifier(100);
+        isLogin = (boolean) SPUtils.getSp(context, "isLogin", false);
+        if (isLogin) {
+            withEmail = (String) SPUtils.getSp(context, "loginName", "");
+        }else {
+            withEmail = "未登录，点击登录";
+        }
+        IProfile profile = new ProfileDrawerItem().withEmail(withEmail).withIcon(R.mipmap.profile3).withIdentifier(100);
 
         header = new AccountHeaderBuilder()
                 .withActivity(this)
@@ -156,14 +180,13 @@ public class MainActivity extends ToolBarActivity{
                 .withHeaderBackground(R.mipmap.header2)
                 .withProfileImagesVisible(true)
                 .withPaddingBelowHeader(true)
-                .addProfiles(
-                        profile
-                )
+                .addProfiles(profile)
                 .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean current) {
                         if (profile instanceof IDrawerItem && profile.getIdentifier() == 100) {
-                            startActivity(new Intent(context, LoginActivity.class));
+                            if (!isLogin)
+                                startActivity(new Intent(context, LoginActivity.class));
 
                         }
 
@@ -178,18 +201,19 @@ public class MainActivity extends ToolBarActivity{
                 .withItemAnimator(new AlphaCrossFadeAnimator())
                 .withAccountHeader(header)
                 .addDrawerItems(
-                        new PrimaryDrawerItem().withName(R.string.action_home).withIcon(R.mipmap.account_circle).withIdentifier(1).withSelectable(true),
-                        new PrimaryDrawerItem().withName(R.string.action_read).withIcon(R.mipmap.account_circle).withIdentifier(2).withSelectable(true),
-                        new PrimaryDrawerItem().withName(R.string.action_collect).withIcon(R.mipmap.account_circle).withIdentifier(3).withSelectable(true),
-                        new PrimaryDrawerItem().withName(R.string.action_notes).withIcon(R.mipmap.account_circle).withIdentifier(4).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.action_home).withIcon(R.drawable.ic_home_red_24dp).withIdentifier(1).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.action_girl).withIcon(R.drawable.ic_redeem_red_24dp).withIdentifier(2).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.action_read).withIcon(R.drawable.ic_redeem_red_24dp).withIdentifier(0).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.action_collect).withIcon(R.drawable.ic_collections_bookmark_red_24dp).withIdentifier(3).withSelectable(true),
+                        new PrimaryDrawerItem().withName(R.string.action_notes).withIcon(R.drawable.ic_event_note_red_36dp).withIdentifier(4).withSelectable(true),
                         new DividerDrawerItem(),
-                        new SwitchDrawerItem().withName(R.string.action_wifi).withTag("wifi").withIcon(R.mipmap.account_circle).withChecked(false).withOnCheckedChangeListener(onCheckedChangeListener).withSelectable(false),
-                        new SwitchDrawerItem().withName(R.string.action_theme).withTag("theme").withIcon(R.mipmap.account_circle).withChecked(false).withOnCheckedChangeListener(onCheckedChangeListener).withSelectable(false),
+//                        new SwitchDrawerItem().withName(R.string.action_wifi).withTag("wifi").withIcon(R.mipmap.account_circle).withChecked(false).withOnCheckedChangeListener(onCheckedChangeListener).withSelectable(false),
+//                        new SwitchDrawerItem().withName(R.string.action_theme).withTag("theme").withIcon(R.drawable.ic_brightness_red_36dp).withChecked(false).withOnCheckedChangeListener(onCheckedChangeListener).withSelectable(false),
 //                        new PrimaryDrawerItem().withName(R.string.action_version).withIcon(R.mipmap.account_circle).withIdentifier(5).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.action_grammar).withIcon(R.mipmap.account_circle).withIdentifier(5).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.action_share).withIcon(R.mipmap.account_circle).withIdentifier(6).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.action_feedback).withIcon(R.mipmap.account_circle).withIdentifier(7).withSelectable(false),
-                        new PrimaryDrawerItem().withName(R.string.action_about).withIcon(R.mipmap.account_circle).withIdentifier(8).withSelectable(false)
+                        new PrimaryDrawerItem().withName(R.string.action_grammar).withIcon(R.drawable.ic_help_red_36dp).withIdentifier(5).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.action_share).withIcon(R.drawable.ic_share_red_36dp).withIdentifier(6).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.action_feedback).withIcon(R.drawable.ic_feedback_red_36dp).withIdentifier(7).withSelectable(false),
+                        new PrimaryDrawerItem().withName(R.string.action_about).withIcon(R.drawable.ic_info_red_36dp).withIdentifier(8).withSelectable(false)
 //                        new PrimaryDrawerItem().withName(R.string.action_quit).withIcon(R.mipmap.account_circle).withIdentifier(9).withSelectable(false)
 
                 )
@@ -197,18 +221,32 @@ public class MainActivity extends ToolBarActivity{
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
                         if (drawerItem != null) {
-                            if (position <= 4) {
+                            if (drawerItem.getIdentifier() <= 4) {
                                 setFragmentStatus((int)drawerItem.getIdentifier());
-                            } else if(position == 9) {
+                            } else if(drawerItem.getIdentifier() == 5) {
+                                startActivity(new Intent(activity, HelpGrammarActivity.class));
+                            }else if(drawerItem.getIdentifier() == 6) {
                                 SharesUtils.shareApp(activity);
+                            } else if(drawerItem.getIdentifier() == 7) {
+                                startActivity(new Intent(activity, FeedbackActivity.class));
+                            } else if(drawerItem.getIdentifier() == 8) {
+                                startActivity(new Intent(activity, AboutActivity.class));
+                            } else if(drawerItem.getIdentifier() == 9) {
+                                SPUtils.setSP(context, "isLogin", false);
+                                isLogin = false;
+                                header.updateProfile(new ProfileDrawerItem().withEmail("未登录，点击登录").withIcon(R.mipmap.profile3).withIdentifier(100));
+                                result.removeItem(9);
+                                showSnackbar(view, "退出登录");
                             }
                         }
                         return false;
                     }
                 })
                 .build();
+        if (isLogin) {
+            result.addItem(new PrimaryDrawerItem().withName(R.string.action_quit).withIcon(R.drawable.ic_exit_login_red_36dp).withIdentifier(9).withSelectable(false));
+        }
 
-//        result.removeItem(9);
 
     }
 
@@ -219,11 +257,10 @@ public class MainActivity extends ToolBarActivity{
                 String tag = (String) drawerItem.getTag();
                 String text = ((Nameable) drawerItem).getName().getText();
                 if(tag.equals("wifi")) {
-                    PreferencesLoader loader = new PreferencesLoader(context);
                     if(isChecked) {
-                        loader.saveBoolean("isWifiLoadImage", true);
+                        SPUtils.setSP(context, "isWifiLoadImage", true);
                     } else {
-                        loader.saveBoolean("isWifiLoadImage", false);
+                        SPUtils.setSP(context, "isWifiLoadImage", false);
                     }
                 }
             } else {
@@ -252,6 +289,16 @@ public class MainActivity extends ToolBarActivity{
     }
 
     @Override
+    protected boolean hasBackButton() {
+        return false;
+    }
+
+    @OnClick(R.id.fab)
+    public void onClick(View view) {
+        startActivity(new Intent(this, SubmitGankActivity.class));
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         return super.onCreateOptionsMenu(menu);
     }
@@ -260,4 +307,18 @@ public class MainActivity extends ToolBarActivity{
 //    public boolean onOptionsItemSelected(MenuItem item) {
 //        return super.onOptionsItemSelected(item);
 //    }
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void onMessageEvent(String userName) {
+        header.updateProfile(new ProfileDrawerItem().withEmail(userName).withIcon(R.mipmap.profile3).withIdentifier(100));
+        result.addItem(new PrimaryDrawerItem().withName(R.string.action_quit).withIcon(R.drawable.ic_exit_login_red_36dp).withIdentifier(9).withSelectable(false));
+        isLogin = true;
+        showSnackbar(drawer, "登录成功");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
+    }
 }

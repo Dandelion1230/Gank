@@ -4,18 +4,35 @@
     android:id="@+id/app_bar"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    app:elevation="0dp"
     android:theme="@style/ThemeOverlay.AppCompat">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/app_tool"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/md_pink_200"
+        android:background="@color/colorAccent"
         android:minHeight="?actionBarSize"
-        app:title="妹纸"
+        app:title=""
         app:layout_scrollFlags="scroll|enterAlways"
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" >
+
+        <TextView
+            android:id="@+id/tool_bar_title"
+            android:text="Gank"
+            android:textSize="@dimen/abc_text_size_title_material_toolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:textColor="@color/white"
+            android:singleLine="true" />
+
+    </android.support.v7.widget.Toolbar>
 
 
 </android.support.design.widget.AppBarLayout>

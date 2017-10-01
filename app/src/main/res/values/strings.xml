@@ -4,10 +4,14 @@
     <string name="app_search">输入搜索内容</string>
     <string name="action_search">action_search</string>
     <string name="action_settings">action_settings</string>
+    <string name="action_refresh">刷新</string>
     <string name="action_login">未登录，点击登录</string>
     <string name="action_home">首页</string>
+    <string name="action_girl">妹纸</string>
     <string name="action_read">闲读</string>
     <string name="action_collect">收藏</string>
+    <string name="copy_link">复制链接</string>
+    <string name="open_link">浏览器打开</string>
     <string name="action_notes">笔记</string>
     <string name="action_wifi">仅WIFI加载图片</string>
     <string name="action_theme">夜间模式</string>
@@ -17,4 +21,6 @@
     <string name="action_about">关于</string>
     <string name="action_feedback">反馈</string>
     <string name="action_quit">退出登录</string>
+    <string name="register">新用户注册</string>
+    <string name="forget_password">忘记密码</string>
 </resources>

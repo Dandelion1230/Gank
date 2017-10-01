@@ -37,19 +37,22 @@
                 android:name="android.app.default_searchable"
                 android:value=".view.ui.SearchResultActivity" />
         </activity>
-        <activity
-            android:name=".view.ui.SearchResultActivity"
-            android:parentActivityName=".view.ui.MainActivity">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".view.ui.MainActivity" />
-            <meta-data
-                android:name="android.app.searchable"
-                android:resource="@xml/searcher" />
+        <activity android:name=".view.ui.SearchResultActivity">
 
-            <intent-filter>
-                <action android:name="android.intent.action.SEARCH" />
-            </intent-filter>
+            <!-- android:parentActivityName=".view.ui.MainActivity" -->
+
+
+            <!-- <meta-data -->
+            <!-- android:name="android.support.PARENT_ACTIVITY" -->
+            <!-- android:value=".view.ui.MainActivity" /> -->
+            <!-- <meta-data -->
+            <!-- android:name="android.app.searchable" -->
+            <!-- android:resource="@xml/searcher" /> -->
+
+
+            <!-- <intent-filter> -->
+            <!-- <action android:name="android.intent.action.SEARCH" /> -->
+            <!-- </intent-filter> -->
         </activity>
         <activity android:name=".view.ui.TabActivity" />
         <activity android:name=".view.ui.LoginActivity" />
@@ -58,9 +61,14 @@
         <service android:name=".update.DownLoadService" />
 
         <activity android:name=".view.ui.RegisteredActivity" />
-        <activity android:name=".view.ui.TestActivity" />
         <activity android:name=".view.ui.PhotoActivity" />
-        <activity android:name=".view.ui.DetailActivity"></activity>
+        <activity android:name=".view.ui.HomeDetailActivity" />
+        <activity android:name=".view.ui.SubmitGankActivity" />
+        <activity android:name=".view.ui.FeedbackActivity" />
+        <activity android:name=".view.ui.AboutActivity" />
+        <activity android:name=".view.ui.OssLicenseActivity" />
+        <activity android:name=".view.ui.HelpGrammarActivity" />
+        <activity android:name=".view.ui.ReadDetailActivity"></activity>
     </application>
 
 </manifest>

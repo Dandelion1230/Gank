@@ -22,4 +22,11 @@ public class SharesUtils {
         shareIntent.setType("text/plain");
         context.startActivity(Intent.createChooser(shareIntent, "分享App到..."));
     }
+    public static void shareText(Context context, String text) {
+        Intent shareIntent = new Intent();
+        shareIntent.setAction(Intent.ACTION_SEND);
+        shareIntent.putExtra(Intent.EXTRA_TEXT, text);
+        shareIntent.setType("text/plain");
+        context.startActivity(Intent.createChooser(shareIntent, "分享到..."));
+    }
 }

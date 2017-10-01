@@ -2,6 +2,7 @@ package com.dandelion.gank.view.ui;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.AppBarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.SearchView;
@@ -10,28 +11,34 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.animation.DecelerateInterpolator;
+import android.widget.TextView;
 
 import com.dandelion.gank.R;
 import com.dandelion.gank.view.base.BaseActivity;
 
-import butterknife.Bind;
+import butterknife.BindView;
 
 public abstract class ToolBarActivity extends BaseActivity {
 
-//    @Bind(R.id.app_tool)
+    @BindView(R.id.app_tool)
     Toolbar appTool;
 
-//    @Bind(R.id.app_bar)
+    @BindView(R.id.app_bar)
     AppBarLayout appBar;
 
+//    @Bind(R.id.tool_bar_title)
+    TextView mToolTitle;
+
     private boolean mIsHidden = false;
+    public SearchView searchView;
 
 
     @Override
     protected void init() {
         super.init();
-        appTool = (Toolbar) findViewById(R.id.app_tool);
-        appBar = (AppBarLayout) findViewById(R.id.app_bar);
+//        appTool = (Toolbar) findViewById(R.id.app_tool);
+//        appBar = (AppBarLayout) findViewById(R.id.app_bar);
+        mToolTitle = (TextView) findViewById(R.id.tool_bar_title);
         if (appTool == null) {
             new IllegalThreadStateException("找不到ToolBar");
         } else {
@@ -41,20 +48,23 @@ public abstract class ToolBarActivity extends BaseActivity {
 
     private void initActionBar() {
         setSupportActionBar(appTool);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowTitleEnabled(false);
         if (hasBackButton()) {
-            ActionBar actionBar = getSupportActionBar();
-            if (actionBar != null)
-            actionBar.setDisplayHomeAsUpEnabled(true);
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+
+            }
         }
     }
 
     public void setActionBarTitle(String title) {
-        appTool.setTitle(title);
+        mToolTitle.setText(title);
     }
 
     // 返回true,有返回键
     protected boolean hasBackButton() {
-        return false;
+        return true;
     }
 
 
@@ -73,12 +83,23 @@ public abstract class ToolBarActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView searchView = (SearchView) menu.findItem(R.id.search).getActionView();
-        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-
+        if (isSearch()) {
+            inflater.inflate(R.menu.search_menu, menu);
+            SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+            searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+            searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+            searchView.setIconifiedByDefault(true);
+            searchView.setFocusable(true);
+            searchView.setIconified(false);
+            searchView.requestFocusFromTouch();
+        }else {
+            inflater.inflate(R.menu.main_menu, menu);
+        }
         return super.onCreateOptionsMenu(menu);
+    }
+
+    public boolean isSearch() {
+        return false;
     }
 
     @Override
@@ -86,8 +107,14 @@ public abstract class ToolBarActivity extends BaseActivity {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
             return true;
+        } else if(item.getItemId() == R.id.search) {
+            startActivity(new Intent(activity, SearchResultActivity.class));
+        } else if(item.getItemId() == R.id.about) {
+            startActivity(new Intent(activity, AboutActivity.class));
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
 }

@@ -5,39 +5,32 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.dandelion.gank.view.fragment.AllFragment;
-import com.dandelion.gank.view.fragment.OtherFragment;
+import com.dandelion.gank.view.fragment.HomeFragment;
 
 /**
  * Created by Administrator on 2016/7/20.
  */
 public class TabAdapter extends FragmentPagerAdapter {
     private FragmentManager fm;
-    private int count;
-    private String[] types = {"all", "Android" , "iOS" , "App" , "前端" , "休息视频", "瞎推荐", "拓展资源"};
+    private String[] types;
 
-    public TabAdapter(FragmentManager fm, int count) {
+    public TabAdapter(FragmentManager fm, String[] types) {
         super(fm);
         this.fm = fm;
-        this.count = count;
+        this.types = types;
     }
 
     @Override
     public Fragment getItem(int position) {
-        if(position == 0) {
-            Fragment allFragment = new AllFragment();
-            return allFragment;
-        } else {
-            Fragment otherFragment = new OtherFragment();
-            Bundle bundle = new Bundle();
-            bundle.putString("data", types[position]);
-            otherFragment.setArguments(bundle);
-            return otherFragment;
-        }
+        Fragment homeFragment = new HomeFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString("data", types[position]);
+        homeFragment.setArguments(bundle);
+        return homeFragment;
     }
 
     @Override
     public int getCount() {
-        return count;
+        return types.length;
     }
 }

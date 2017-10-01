@@ -1,186 +1,139 @@
 package com.dandelion.gank.view.fragment;
 
-import android.support.v4.app.Fragment;
+import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.view.View;
+
+import com.dandelion.gank.R;
+import com.dandelion.gank.model.entity.GankResult;
+import com.dandelion.gank.model.entity.GankRoot;
+import com.dandelion.gank.net.RxUtils;
+import com.dandelion.gank.utils.SPUtils;
+import com.dandelion.gank.view.adapter.CollectionAdapter;
+import com.dandelion.gank.view.base.BaseAdapter;
+import com.dandelion.gank.view.base.BaseRefreshFragment;
+import com.dandelion.gank.view.ui.HomeDetailActivity;
+
+import java.util.List;
+
+import rx.Subscriber;
 
 /**
  * Created by Administrator on 2016/7/20.
  */
-public class CollectFragment extends Fragment {
-//    @Bind(R.id.recycler)
-//    LRecyclerView mRecycler;
-//
-//    private HomeAdapter mHomeAdapter = null;
-//    private LRecyclerViewAdapter mLRecyclerViewAdapter = null;
-//    private boolean isRefresh = false;
-//
-//    /**服务器端一共多少条数据*/
-//    private static final int TOTAL_COUNTER = 34;
-//
-//    /**每一页展示多少条数据*/
-//    private static final int REQUEST_COUNT = 10;
-//
-//    /**已经获取到多少条数据了*/
-//    private static int mCurrentCounter = 0;
-//
-////    @Override
-////    public void onCreate(Bundle savedInstanceState) {
-////        super.onCreate(savedInstanceState);
-////        setContentView(R.layout.activity_test);
-////        ButterKnife.bind(this);
-////        mHomeAdapter = new HomeAdapter(this);
-////        mLRecyclerViewAdapter = new LRecyclerViewAdapter(this, mHomeAdapter);
-////        mRecycler.setAdapter(mLRecyclerViewAdapter);
-////        initRecyclerView();
-////        setListener();
-////    }
-//
-//    @Nullable
-//    @Override
-//    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-//        View view = inflater.inflate(R.layout.activity_test, null);
-//        ButterKnife.bind(this, view);
-//        return view;
-//    }
-//
-//    @Override
-//    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-//        super.onActivityCreated(savedInstanceState);
-//        mHomeAdapter = new HomeAdapter(getActivity());
-//        mLRecyclerViewAdapter = new LRecyclerViewAdapter(getActivity(), mHomeAdapter);
-//        mRecycler.setAdapter(mLRecyclerViewAdapter);
-//        initRecyclerView();
-//        setListener();
-//    }
-//
-//    private void setListener() {
-//        mRecycler.setLScrollListener(new LRecyclerView.LScrollListener() {
-//            @Override
-//            public void onRefresh() {
-//                isRefresh = true;
-//                getGankHomeData();
-//            }
-//
-//            @Override
-//            public void onScrollUp() {
-//
-//            }
-//
-//            @Override
-//            public void onScrollDown() {
-//
-//            }
-//
-//            @Override
-//            public void onBottom() {
-//                LoadingFooter.State state = RecyclerViewStateUtils.getFooterViewState(mRecycler);
-//                if(state == LoadingFooter.State.Loading) {
-////                    TLog.log("the state is Loading, just wait..");
-//                    return;
-//                }
-////                RecyclerViewStateUtils.setFooterViewState(getActivity(), mRecycler, REQUEST_COUNT, LoadingFooter.State.Loading, null);
-////                getGankHomeData();
-//
-//                if (mCurrentCounter < TOTAL_COUNTER) {
-//                    // loading more
-//                    RecyclerViewStateUtils.setFooterViewState(getActivity(), mRecycler, REQUEST_COUNT, LoadingFooter.State.Loading, null);
-//                    getGankHomeData();
-//                } else {
-//                    //the end
-//                    RecyclerViewStateUtils.setFooterViewState(getActivity(), mRecycler, REQUEST_COUNT, LoadingFooter.State.TheEnd, null);
-//                }
-//            }
-//
-//            @Override
-//            public void onScrolled(int distanceX, int distanceY) {
-//
-//            }
-//        });
-//        mRecycler.setRefreshing(true);
-//        mLRecyclerViewAdapter.setOnItemClickListener(new OnItemClickListener() {
-//            @Override
-//            public void onItemClick(View view, int position) {
-//                SnackbarUtils.show(mRecycler, "onItemClick", Snackbar.LENGTH_SHORT);
-//            }
-//
-//            @Override
-//            public void onItemLongClick(View view, int position) {
-//                SnackbarUtils.show(mRecycler, "onItemLongClick", Snackbar.LENGTH_SHORT);
-//            }
-//        });
-//    }
-//
-//    private void initRecyclerView() {
-//        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-//        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-//        //防止item位置互换
-//        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
-//        mRecycler.setLayoutManager(layoutManager);
-////        mRecycler.setLayoutManager(new LinearLayoutManager(getActivity()));
-//    }
-//
-//    private void getGankHomeData() {
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                Subscriber<List<GankResult>> subscriber = new Subscriber<List<GankResult>>() {
-//                    @Override
-//                    public void onCompleted() {
-////                mLoading.setVisibility(View.GONE);
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        Snackbar.make(mRecycler, e.getMessage(), Snackbar.LENGTH_INDEFINITE)
-//                                .setAction("重试", new View.OnClickListener() {
-//                                    @Override
-//                                    public void onClick(View v) {
-//                                        getGankHomeData();
-//                                    }
-//                                }).show();
-//
-//                    }
-//
-//                    @Override
-//                    public void onNext(List<GankResult> gankResults) {
-//                        proData(gankResults);
-//                    }
-//                };
-//                HttpUtils.getInstance().getGankHomeData(subscriber, 10, 1);
-//            }
-//        }, 1000);
-//
-//    }
-//
-//    private void proData(List<GankResult> gankResults) {
-//        if (isRefresh) {  // 下拉刷新
-//            mHomeAdapter.clear();
-//            mCurrentCounter = 0;
-////            mHomeAdapter.addAll(gankResults);
-//        }
-//        mHomeAdapter.addAll(gankResults);
-//        mCurrentCounter += gankResults.size();
-//        if (isRefresh) {
-//            isRefresh = false;
-//            mRecycler.refreshComplete();
-//            notifyDataSetChanged();
-//        } else {
-//            RecyclerViewStateUtils.setFooterViewState(mRecycler, LoadingFooter.State.Normal);
-//        }
-//    }
-//
-//    private void notifyDataSetChanged() {
-//        mLRecyclerViewAdapter.notifyDataSetChanged();
-//    }
-//
-//
-////    @OnClick(R.id.fab)
-////    public void fabOnClick(View view) {
-////        mRecycler.smoothScrollToPosition(0);
-////    }
-//
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        ButterKnife.unbind(this);
-//    }
+public class CollectFragment extends BaseRefreshFragment implements CollectionAdapter.OnItemClickListener {
+    private CollectionAdapter mCollectAdapter;
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.fragment_collect;
+    }
+
+    @Override
+    public void onCreateAfter(Bundle savedInstanceState) {
+        super.onCreateAfter(savedInstanceState);
+
+    }
+
+    @Override
+    public void initData() {
+        mRecyclerView.refresh();
+    }
+
+
+    @Override
+    protected void initRecyclerView() {
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+    }
+
+    @Override
+    public void onHiddenChanged(boolean hidden) {
+        super.onHiddenChanged(hidden);
+        if (!hidden) {
+            mRecyclerView.refresh();
+        }
+    }
+
+    @Override
+    protected void getGankData() {
+        Subscriber<List<GankResult>> subscriber = new Subscriber<List<GankResult>>() {
+            @Override
+            public void onCompleted() {
+                mRecyclerView.refreshComplete(pageSize);
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                View.OnClickListener onClickListener = new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getGankData();
+                    }
+                };
+                showActionSnackbar(e.getMessage(), "重试", onClickListener);
+
+            }
+
+            @Override
+            public void onNext(List<GankResult> collectionList) {
+                mRecyclerView.refreshComplete(pageSize);
+                proData(collectionList);
+            }
+        };
+        String userId = (String) SPUtils.getSp(mContext, "userId", "");
+        String where = "{\"userId\":\""+userId+"\"}";
+        RxUtils.getInstance().getCollectionData(subscriber, where);
+
+    }
+
+    @Override
+    protected BaseAdapter getAdapter() {
+        if (mCollectAdapter == null) {
+            mCollectAdapter = new CollectionAdapter();
+            mCollectAdapter.setOnItemClickListener(this);
+        }
+        return mCollectAdapter;
+    }
+
+
+    private void proData(List<GankResult> collectionList) {
+        mCurrentCounter += collectionList.size();
+        getAdapter().addAll(collectionList);
+    }
+
+
+    @Override
+    public void onDelClick(int positon) {
+        delCollectionData(positon);
+    }
+
+    @Override
+    public void onItemClick(int positon) {
+        startActivity(HomeDetailActivity.newIntent(getActivity(), mCollectAdapter.getDataList().get(positon)));
+    }
+
+    private void delCollectionData(final int positon) {
+        GankResult result = (GankResult) getAdapter().getDataList().get(positon);
+        String objectId = result.getObjectId();
+        Subscriber<GankRoot> subscriber = new Subscriber<GankRoot>() {
+            @Override
+            public void onCompleted() {
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                showShortSnackbar(e.getMessage());
+            }
+
+            @Override
+            public void onNext(GankRoot root) {
+                if (root.getMsg().equals("ok")) {
+                    showShortSnackbar("删除成功");
+                    getAdapter().delete(positon);
+                }
+            }
+        };
+        RxUtils.getInstance().getDelCollectionData(subscriber, objectId);
+
+    }
 }

@@ -7,7 +7,16 @@ import java.io.Serializable;
  */
 public class GankRoot<T> implements Serializable {
     public boolean error;
+    private String msg;
     public T results;
+
+    public String getMsg() {
+        return msg;
+    }
+
+    public void setMsg(String msg) {
+        this.msg = msg;
+    }
 
     public boolean isError() {
         return error;

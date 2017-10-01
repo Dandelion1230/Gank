@@ -1,51 +1,31 @@
 package com.dandelion.gank.view.base;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.dandelion.gank.R;
-import com.dandelion.gank.adapter.HomeAdapter;
-import com.dandelion.gank.view.adapter.AllAdapter;
-import com.github.jdsjlzx.interfaces.OnItemClickListener;
-import com.github.jdsjlzx.recyclerview.LRecyclerView;
-import com.github.jdsjlzx.recyclerview.LRecyclerViewAdapter;
-import com.github.jdsjlzx.util.RecyclerViewStateUtils;
-import com.github.jdsjlzx.view.LoadingFooter;
+import com.dandelion.gank.utils.SPUtils;
+import com.dandelion.gank.view.ui.LoginActivity;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 /**
  * Created by Administrator on 2016/8/26.
  */
-public abstract class BaseFragment extends Fragment implements BaseViewInterface, OnItemClickListener {
+public abstract class BaseFragment extends Fragment implements BaseViewInterface {
 
-    private View view;
-
-    @Bind(R.id.recycler)
-    public LRecyclerView mRecyclerView;
-
-    public HomeAdapter mHomeAdapter = null;
-    public AllAdapter mAllAdapter = null;
-    public LRecyclerViewAdapter mLRecyclerViewAdapter = null;
-    public boolean isRefresh = false;
-
-    /**服务器端一共多少条数据*/
-    public static int TOTAL_COUNTER = 10000;
-
-    /**每一页展示多少条数据*/
-    public static int REQUEST_COUNT = 10;
-
-    /**已经获取到多少条数据了*/
-    public static int mCurrentCounter = 0;
-    protected String type;
-    protected int pageSize = 10;
-    protected int pageNo = 1;
+    public View view;
+    private Unbinder bind;
+    protected Context mContext;
+    protected Activity mActivity;
 
     @Nullable
     @Override
@@ -54,7 +34,7 @@ public abstract class BaseFragment extends Fragment implements BaseViewInterface
             new IllegalThreadStateException("没有给fragment设置布局");
         } else {
             view = inflater.inflate(getLayoutId(), null);
-            ButterKnife.bind(this, view);
+            bind = ButterKnife.bind(this, view);
         }
         return view;
     }
@@ -62,94 +42,31 @@ public abstract class BaseFragment extends Fragment implements BaseViewInterface
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
+        mContext = getContext();
+        mActivity = getActivity();
         onCreateAfter(savedInstanceState);
-        if (adapterType() == 1) {
-            mHomeAdapter = new HomeAdapter(getActivity());
-            mLRecyclerViewAdapter = new LRecyclerViewAdapter(getActivity(), mHomeAdapter);
-            mRecyclerView.setAdapter(mLRecyclerViewAdapter);
-        } else if(adapterType() == 2){
-            mAllAdapter = new AllAdapter();
-            mLRecyclerViewAdapter = new LRecyclerViewAdapter(getActivity(), mAllAdapter);
-            mRecyclerView.setAdapter(mLRecyclerViewAdapter);
+        initData();
+    }
+
+
+    public boolean launchLogin() {
+        boolean isLogin = (boolean) SPUtils.getSp(mContext, "isLogin", false);
+        if (!isLogin) {
+            Intent intent = new Intent(mContext, LoginActivity.class);
+            startActivity(intent);
         }
-        initRecyclerView();
-        setListener();
+        return isLogin;
     }
 
-    private void setListener() {
-        mLRecyclerViewAdapter.setOnItemClickListener(this);
-        mRecyclerView.setLScrollListener(new LRecyclerView.LScrollListener() {
-            @Override
-            public void onRefresh() {
-                isRefresh = true;
-                if (isVisibleGone() || isGone) {
-                    pageNo = 1;
-                    getGankData();
-                }
-            }
-
-            @Override
-            public void onScrollUp() {
-
-            }
-
-            @Override
-            public void onScrollDown() {
-
-            }
-
-            @Override
-            public void onBottom() {
-                LoadingFooter.State state = RecyclerViewStateUtils.getFooterViewState(mRecyclerView);
-                if(state == LoadingFooter.State.Loading) {
-//                    TLog.log("the state is Loading, just wait..");
-                    return;
-                }
-
-                if (mCurrentCounter < TOTAL_COUNTER) {
-                    // loading more
-                    RecyclerViewStateUtils.setFooterViewState(getActivity(), mRecyclerView, REQUEST_COUNT, LoadingFooter.State.Loading, null);
-                    pageNo += 1;
-                    getGankData();
-                } else {
-                    //the end
-                    RecyclerViewStateUtils.setFooterViewState(getActivity(), mRecyclerView, REQUEST_COUNT, LoadingFooter.State.TheEnd, null);
-                }
-            }
-
-            @Override
-            public void onScrolled(int distanceX, int distanceY) {
-
-            }
-        });
-        mRecyclerView.setRefreshing(true);
-        isGone = true; // 解决onRefresh和setUserVisibleHint的冲突
+    public void showActionSnackbar(String msg, String textAction, View.OnClickListener onClickListener) {
+        Snackbar.make(view, msg, Snackbar.LENGTH_LONG).setAction(textAction, onClickListener).show();
     }
-
-    public abstract int adapterType();
-    protected boolean isGone = false;
-    public boolean isVisibleGone() {
-        return false;
+    public void showShortSnackbar(String msg) {
+        Snackbar.make(view, msg, Snackbar.LENGTH_SHORT).show();
     }
-
-    protected abstract void getGankData();
-
-    protected abstract void initRecyclerView();
-
-    @Override
-    public void setUserVisibleHint(boolean isVisibleToUser) {
-        super.setUserVisibleHint(isVisibleToUser);
-        if (getUserVisibleHint()) {
-            Bundle arguments = getArguments();
-            if (arguments != null) {
-                type = arguments.getString("data");
-                Log.e("TAG", type);
-            }
-            getGankData();
-        }
+    public void showLongSnackbar(String msg) {
+        Snackbar.make(view, msg, Snackbar.LENGTH_LONG).show();
     }
-
 
     @Override
     public void onResume() {
@@ -164,10 +81,7 @@ public abstract class BaseFragment extends Fragment implements BaseViewInterface
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(view);
+        bind.unbind();
     }
-
-
-
 
 }

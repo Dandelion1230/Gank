@@ -2,6 +2,7 @@ package com.dandelion.gank.view.base;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -14,12 +15,11 @@ import android.widget.EditText;
 
 import com.dandelion.gank.AppManager;
 import com.dandelion.gank.R;
-import com.dandelion.gank.URLs;
+import com.dandelion.gank.utils.SPUtils;
 import com.dandelion.gank.utils.SystemBarUtils;
+import com.dandelion.gank.view.ui.LoginActivity;
 
 import butterknife.ButterKnife;
-import cn.bmob.v3.Bmob;
-import cn.bmob.v3.BmobConfig;
 
 public abstract class BaseActivity extends AppCompatActivity implements BaseViewInterface {
 
@@ -36,25 +36,8 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //第一：默认初始化
-        // Bmob.initialize(this, "Your Application ID");
-
-        //第二：自v3.4.7版本开始,设置BmobConfig,允许设置请求超时时间、文件分片上传时每片的大小、文件的过期时间(单位为秒)，
-        BmobConfig config = new BmobConfig.Builder(this)
-                ////设置appkey
-                .setApplicationId(URLs.BMOB_ID)
-                ////请求超时时间（单位为秒）：默认15s
-                .setConnectTimeout(30)
-                ////文件分片上传时每片的大小（单位字节），默认512*1024
-                .setUploadBlockSize(1024 * 1024)
-                ////文件的过期时间(单位为秒)：默认1800s
-                .setFileExpiration(2500)
-                .build();
-        Bmob.initialize(config);
         if (isNeedLogin()) {
-            finish();
-//            Intent intent = new Intent(this, LoginActivity.class);
-//            startActivity(intent);
+            launchLogin();
         }
         if (getLayoutId() != 0) { // 没有设置布局
             setContentView(getLayoutId());
@@ -97,6 +80,15 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
         return false;
     }
 
+    public boolean launchLogin () {
+        boolean isLogin = (boolean) SPUtils.getSp(this, "isLogin", false);
+        if (!isLogin) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
+        return isLogin;
+    }
+
     /**
      * 显示输入法
      *
@@ -129,5 +121,4 @@ public abstract class BaseActivity extends AppCompatActivity implements BaseView
     public void showSnackbar(View view, String text) {
         Snackbar.make(view, text, Snackbar.LENGTH_SHORT).show();
     }
-
 }
